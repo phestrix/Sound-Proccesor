@@ -22,10 +22,11 @@ std::vector<unsigned>* Parser_cfg::read_stream_and_second() {
   size_t pos_of_stream = tmp.find("$");
   std::vector<unsigned> res;
   res.push_back((unsigned)tmp.at(pos_of_stream + 1));  // add number of stream
+
   size_t pos_after_stream =
       tmp.find(" ", pos_of_stream + 1);  // find next " " before number
   size_t i1 = tmp.find(" ", pos_after_stream + 1);  // find " " after number
-  size_t diff = i1 - pos_after_stream;              // difference between them
+  size_t diff = i1 - pos_after_stream;              // difference between numbers
   unsigned second = 0;
   for (size_t i = 0; i < diff; ++i) {
     second += ((10 * i + 1) * tmp.at(i1 - i));  // add number to numeral
