@@ -6,7 +6,6 @@
 class Parser_cfg {
  private:
   std::ifstream config_file;
-  char* buf;
 
  public:
   Parser_cfg(std::string filename) { config_file.open(filename); };
@@ -17,8 +16,9 @@ class Parser_cfg {
   };
 
   char* read_conv();
-  std::vector<unsigned>* read_seconds();
-  std::vector<unsigned>* read_stream_and_second();
+  std::vector<unsigned>* read_seconds(std::string* str);
+  std::vector<unsigned>* read_stream_and_second(std::string* str);
+  void parse_config_file();
 };
 
 #endif
