@@ -117,3 +117,14 @@ char* Parser_cfg::get_conv() {
   std::reverse(buffer.begin(), buffer.end());
   return &a;
 }
+
+std::vector<unsigned>* Parser_cfg::get_seconds() {
+  std::vector<unsigned> ret = mute_seconds;
+  return &ret;
+}
+
+std::vector<std::pair<std::string, unsigned>>*
+Parser_cfg::get_streams_and_seconds() {
+  std::vector<std::pair<std::string, unsigned>> ret = stream_seconds_for_mix;
+  return &ret;
+}
