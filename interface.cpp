@@ -1,6 +1,7 @@
 #include "interface.hpp"
 
 #include <algorithm>
+#include <utility>
 
 Interface::Interface(std::string output, std::string cfg_file,
                      std::vector<std::string> inputs) {
@@ -9,10 +10,11 @@ Interface::Interface(std::string output, std::string cfg_file,
   mode = cfg.get_conv();
   seconds = cfg.get_seconds();
   stream_to_mix = cfg.get_streams_and_seconds();
-  output_file.open(output);
-  for (size_t i = 0; i < inputs.size(); ++i) {
-    input_files[i].open(inputs[i]);
-  }
+  
+}
+
+Interface::~Interface() {
+ 
 }
 
 static void rstr_pop(std::string* str) {
@@ -35,4 +37,9 @@ void Interface::do_conv() {
 
 void Interface::call_mixer() {}
 
-void Interface::call_muter() {}
+void Interface::call_muter() {
+  factory.add<Muter>("Muter");
+  Converter* muter = factory.get("Muter")(this->input_files[0], this->output_file, this->seconds[0], this->seconds[1]);
+  muter->convert();
+  
+}

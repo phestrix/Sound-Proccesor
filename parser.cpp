@@ -2,16 +2,16 @@
 
 #include <cstring>
 
-Parser::Parser(std::string filename) {
+Parser::Parser(std::string filename_in, std::string filename_out) {
   char tmp[44];
-  input_file.open(filename, std::ifstream::binary);
+  input_file.open(filename_in, std::ifstream::binary);
   input_file.read(tmp, sizeof(WAVheader));
   header = (WAVheader*)tmp;
   if (!check_input()) {
     throw std::invalid_argument("not able to find \"data\" chunk");
   }
-  std::string out_file = filename + "_out";
-  output_file.open(out_file, std::ofstream::binary);
+
+  output_file.open(filename_out, std::ofstream::binary);
   output_file.write(tmp, 44);
 }
 
@@ -129,3 +129,4 @@ void Parser::copy_samples(unsigned* shift, unsigned* bytes_to_change) {
   output_file.seekp(*shift);
   output_file.write(tmp, *shift);
 }
+

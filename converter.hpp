@@ -17,8 +17,10 @@ class Muter : public Converter {
   std::string ouput_file;
   unsigned start;
   unsigned end;
+  
 
  public:
+ Muter(std::string filename_in, std::string filename_out, unsigned s_sec, unsigned e_sec);
   void convert();
   ~Muter();
 };

@@ -8,12 +8,12 @@
 
 class Interface {
  private:
-  std::vector<std::ifstream> input_files;
-  std::ofstream output_file;
+  std::vector<std::string> input_files;
+  std::string output_file;
   std::string mode;
   std::vector<unsigned> seconds;
   std::vector<std::pair<std::string, unsigned>> stream_to_mix;
-  
+  Factory<std::string, Converter, std::string, std::string, unsigned, unsigned> factory;
 
  public:
   Interface(std::string output, std::string cfg_file,
