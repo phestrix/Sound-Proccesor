@@ -7,7 +7,6 @@
 class Converter {
  public:
   Converter(){};
-
   virtual void convert() = 0;
   virtual ~Converter();
 };

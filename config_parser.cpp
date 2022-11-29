@@ -1,6 +1,5 @@
 #include "config_parser.hpp"
 
-#include <algorithm>
 #include <cstring>
 
 void Parser_cfg::parse_config_file() {
@@ -111,18 +110,11 @@ std::vector<unsigned>* read_stream_and_second(std::string* str,
   }
 }
 
-char Parser_cfg::get_conv() {
-  char a = buffer.at(0);
-  std::reverse(buffer.begin(), buffer.end());
-  buffer.pop_back();
-  std::reverse(buffer.begin(), buffer.end());
-  return a;
-}
+inline std::string Parser_cfg::get_conv() { return buffer; }
 
-std::vector<unsigned> Parser_cfg::get_seconds() { return mute_seconds; }
+inline std::vector<unsigned> Parser_cfg::get_seconds() { return mute_seconds; }
 
-std::vector<std::pair<std::string, unsigned>>
+inline std::vector<std::pair<std::string, unsigned>>
 Parser_cfg::get_streams_and_seconds() {
   return stream_seconds_for_mix;
 }
-
