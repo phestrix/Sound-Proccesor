@@ -23,9 +23,10 @@ class Parser_cfg {
   std::vector<unsigned>* read_stream_and_second(std::string* str,
                                                 std::vector<unsigned>* res);
   void parse_config_file();
-  char* get_conv();
-  std::vector<unsigned>* get_seconds();
-  std::vector<std::pair<std::string, unsigned>>* get_streams_and_seconds();
+  char get_conv();
+  std::vector<unsigned> get_seconds();
+  std::vector<std::pair<std::string, unsigned>> get_streams_and_seconds();
+  
 };
 
 #endif

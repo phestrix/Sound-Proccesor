@@ -20,7 +20,8 @@ void Parser_cfg::parse_config_file() {
     if (buf.find(mix)) {
       std::vector<unsigned> res;
       read_stream_and_second(&buf, &res);
-      std::string tmp = "input" + res.at(0);
+      std::string tmp = "input";
+      tmp.push_back(res.at(0));
       stream_seconds_for_mix.push_back(std::make_pair(tmp, res.at(1)));
       tmp.~basic_string();
       res.clear();
@@ -110,21 +111,18 @@ std::vector<unsigned>* read_stream_and_second(std::string* str,
   }
 }
 
-char* Parser_cfg::get_conv() {
+char Parser_cfg::get_conv() {
   char a = buffer.at(0);
   std::reverse(buffer.begin(), buffer.end());
   buffer.pop_back();
   std::reverse(buffer.begin(), buffer.end());
-  return &a;
+  return a;
 }
 
-std::vector<unsigned>* Parser_cfg::get_seconds() {
-  std::vector<unsigned> ret = mute_seconds;
-  return &ret;
-}
+std::vector<unsigned> Parser_cfg::get_seconds() { return mute_seconds; }
 
-std::vector<std::pair<std::string, unsigned>>*
+std::vector<std::pair<std::string, unsigned>>
 Parser_cfg::get_streams_and_seconds() {
-  std::vector<std::pair<std::string, unsigned>> ret = stream_seconds_for_mix;
-  return &ret;
+  return stream_seconds_for_mix;
 }
+
