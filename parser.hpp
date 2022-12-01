@@ -11,6 +11,7 @@ class Parser {
   std::ifstream input_file;
   unsigned bytes_sec_s;
   unsigned bytes_sec_e;
+  unsigned byte_after_data;
   struct WAVheader {
     char chunk_id[4];
 

@@ -53,7 +53,7 @@ bool Parser::check_input() {
     if (!strcmp(header->subchunk2_id, "list")) {
       return false;
     } else {
-      while (!input_file.eof()) {
+      while (!input_file.good()) {
         if (find_list_in_header()) {
           return true;
         }
@@ -71,6 +71,7 @@ bool Parser::find_list_in_header() {
     input_file.seekg(4);
     return false;
   }
+  byte_after_data = input_file.tellg();
   for (char i = 0; i < 4; ++i) {
     header->subchunk2_id[i] = buf[i];
   }
@@ -106,8 +107,8 @@ void Parser::mute_samples(unsigned* shift, unsigned* bytes_to_change) {
     return;
   }
 
-  input_file.seekg(*shift);
-  output_file.seekp(*shift);
+  input_file.seekg(*shift + byte_after_data);
+  output_file.seekp(*shift + byte_after_data);
   char* tmp_block = new char[*bytes_to_change];
   for (size_t i = 0; i < *bytes_to_change; ++i) {
     tmp_block[i] ^= tmp_block[i];
@@ -123,10 +124,9 @@ void Parser::copy_samples(unsigned* shift, unsigned* bytes_to_change) {
     return;
   }
 
-  input_file.seekg(*shift);
+  input_file.seekg(*shift + byte_after_data);
   char* tmp = new char[*bytes_to_change];
   input_file.read(tmp, *bytes_to_change);
-  output_file.seekp(*shift);
+  output_file.seekp(*shift + byte_after_data);
   output_file.write(tmp, *shift);
 }
-
