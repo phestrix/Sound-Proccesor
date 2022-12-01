@@ -5,7 +5,7 @@
 
 class Parser_cmd {
  private:
- void parse();
+ 
 
  public:
   Parser_cmd(int* ac, char* av[]);

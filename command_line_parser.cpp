@@ -4,6 +4,19 @@
 
 #include "interface.hpp"
 
+static bool check_args(std::vector<std::string>* arr) {
+  for (size_t i = 0; i < arr->size(); ++i) {
+    if ((arr->at(0).find("out") || arr->at(i).find("in")) &&
+        (arr->at(0).find("conf") || arr->at(i).find("cfg")))
+      return false;
+    if (arr->at(i).find("out") && arr->at(i).find("in")) return false;
+  }
+  if (!arr->at(2).find(".txt")) return false;
+  if (!arr->at(3).find(".wav")) return false;
+  if (!arr->at(4).find(".wav")) return false;
+  return true;
+}
+
 Parser_cmd::Parser_cmd(int* ac, char* av[]) {
   std::vector<std::string> names;
   bool need_help = false;
@@ -28,5 +41,6 @@ Parser_cmd::Parser_cmd(int* ac, char* av[]) {
     throw std::invalid_argument(
         "Too few arguments\nMust be 4 or more, for mode, inputs, output");
   }
+  if (!check_args(&names)) throw std::invalid_argument("Wrong arguments");
   Interface interface(names.at(4), names.at(3), names.at(5));
 }
