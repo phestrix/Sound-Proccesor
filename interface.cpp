@@ -4,7 +4,7 @@
 #include <utility>
 
 Interface::Interface(std::string output, std::string cfg_file,
-                     std::vector<std::string> inputs) {
+                     std::string inputs) {
   Parser_cfg cfg(cfg_file);
   cfg.parse_config_file();
   mode = cfg.get_conv();
@@ -39,7 +39,7 @@ void Interface::call_mixer() {}
 
 void Interface::call_muter() {
   factory.add<Muter>("Muter");
-  Converter* muter = factory.get("Muter")(this->input_files[0], this->output_file, this->seconds[0], this->seconds[1]);
+  Converter* muter = factory.get("Muter")(this->input_files, this->output_file, this->seconds[0], this->seconds[1]);
   muter->convert();
   
 }

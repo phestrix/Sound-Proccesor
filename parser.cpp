@@ -72,7 +72,7 @@ bool Parser::find_list_in_header() {
     return false;
   }
   byte_after_data = input_file.tellg();
-  for (char i = 0; i < 4; ++i) {
+  for (size_t i = 0; i < 4; ++i) {
     header->subchunk2_id[i] = buf[i];
   }
   input_file.seekg(4);

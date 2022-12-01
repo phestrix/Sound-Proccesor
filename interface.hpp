@@ -8,7 +8,7 @@
 
 class Interface {
  private:
-  std::vector<std::string> input_files;
+  std::string input_files;
   std::string output_file;
   std::string mode;
   std::vector<unsigned> seconds;
@@ -17,7 +17,7 @@ class Interface {
 
  public:
   Interface(std::string output, std::string cfg_file,
-            std::vector<std::string> inputs);
+            std::string inputs);
   ~Interface();
   void do_conv();
   void call_muter();
