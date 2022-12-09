@@ -44,3 +44,5 @@ Parser_cmd::Parser_cmd(int* ac, char* av[]) {
   if (!check_args(&names)) throw std::invalid_argument("Wrong arguments");
   Interface interface(names.at(4), names.at(3), names.at(5));
 }
+
+Parser_cmd::~Parser_cmd() {}

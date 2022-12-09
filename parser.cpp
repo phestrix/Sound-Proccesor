@@ -12,6 +12,18 @@ Parser::Parser(std::string filename_in, std::string filename_out) {
   }
 
   output_file.open(filename_out, std::ofstream::binary);
+}
+
+Parser::Parser(std::string filename_in) {
+  char tmp[44];
+  input_file.open(filename_in, std::ifstream::binary);
+  input_file.read(tmp, sizeof(WAVheader));
+  header = (WAVheader*)tmp;
+  if (!check_input()) {
+    throw std::invalid_argument("not able to find \"data\" chunk");
+  }
+
+  output_file.open(filename_in + "out", std::ofstream::binary);
   output_file.write(tmp, 44);
 }
 

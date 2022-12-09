@@ -34,7 +34,7 @@ void Parser_cfg::parse_config_file() {
       mute_seconds.push_back(res.at(0));
       mute_seconds.push_back(res.at(1));
       res.clear();
-      buffer.push_back('x');
+      buffer.push_back('m');
     }
   }
 };

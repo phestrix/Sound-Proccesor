@@ -27,13 +27,14 @@ class Muter : public Converter {
 
 class Mixer : public Converter {
  private:
-  std::string input_file;
-  std::string ouput_file;
-  unsigned end;
-  std::string to_mix;
+  unsigned second;
+  std::string in;
+  std::string out;
 
  public:
   void convert();
+  Mixer(std::string filename_in, std::string filename_out, unsigned sec);
+  Mixer(std::string filename_in, std::string filename_out);
   ~Mixer();
 };
 

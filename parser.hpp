@@ -50,11 +50,11 @@ class Parser {
 
  public:
   Parser(std::string filename_in, std::string filename_out);
+  Parser(std::string filename_in);
   ~Parser();
   unsigned long get_bytes_per_second();
   void mute_samples(unsigned* shift, unsigned* bytes_to_change);  // mute
   void copy_samples(unsigned* shift, unsigned* bytes_to_change);  // copy
-  unsigned* convert_sec_to_bytes(unsigned* sec);
 };
 
 #endif
