@@ -94,11 +94,11 @@ bool Parser::find_list_in_header() {
   return true;
 }
 
-inline unsigned long Parser::get_bytes_per_second() {
+unsigned long Parser::get_bytes_per_second() {
   return header->byte_rate;
 }
 
-bool Parser::check_args(unsigned* shift, unsigned* bytes_to_change) {
+bool Parser::check_args(unsigned long* shift, unsigned long* bytes_to_change) {
   size_t tmp = input_file.gcount();
   if ((*shift) > tmp) {
     return false;
@@ -113,7 +113,7 @@ bool Parser::check_args(unsigned* shift, unsigned* bytes_to_change) {
 }
 
 // mute
-void Parser::mute_samples(unsigned* shift, unsigned* bytes_to_change) {
+void Parser::mute_samples(unsigned long* shift, unsigned long* bytes_to_change) {
   if (!check_args(shift, bytes_to_change)) {
     throw std::invalid_argument("file doesnt contain this amount of seconds");
     return;
@@ -130,7 +130,7 @@ void Parser::mute_samples(unsigned* shift, unsigned* bytes_to_change) {
 }
 
 // copy
-void Parser::copy_samples(unsigned* shift, unsigned* bytes_to_change) {
+void Parser::copy_samples(unsigned long* shift, unsigned long* bytes_to_change) {
   if (!check_args(shift, bytes_to_change)) {
     throw std::invalid_argument("file doesnt contain this amount of seconds");
     return;

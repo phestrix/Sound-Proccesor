@@ -3,24 +3,25 @@
 #include <fstream>
 #include <vector>
 
-#include "config_parser.hpp"
 #include "converter.hpp"
 
 class Interface {
  private:
-  std::string input_files;
+  std::vector<std::string> input_files;
+  std::string cfg_file;
   std::string output_file;
   std::string mode;
-  std::vector<unsigned> seconds;
-  std::vector<std::pair<std::string, unsigned>> stream_to_mix;
-  Factory<std::string, Converter, std::string, std::string, unsigned, unsigned> factory;
+  std::vector<unsigned long> seconds;
+  std::vector<std::pair<std::string, unsigned long>> stream_to_mix;
+  Factory<std::string, Converter, std::string, std::string, unsigned long,
+          unsigned long>
+      factory;
 
  public:
-  Interface(std::string output, std::string cfg_file,
-            std::string inputs);
+  Interface(std::vector<std::string> inputs);
   ~Interface();
-  void do_conv();
-  void call_muter();
+  void do_conv(unsigned long number);
+  void call_muter(unsigned long number);
   void call_mixer();
 };
 

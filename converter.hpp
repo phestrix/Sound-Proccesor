@@ -15,25 +15,25 @@ class Muter : public Converter {
  private:
   std::string input_file;
   std::string ouput_file;
-  unsigned start;
-  unsigned end;
+  unsigned long start;
+  unsigned long end;
   
 
  public:
- Muter(std::string filename_in, std::string filename_out, unsigned s_sec, unsigned e_sec);
+ Muter(std::string filename_in, std::string filename_out, unsigned long s_sec, unsigned long e_sec);
   void convert();
   ~Muter();
 };
 
 class Mixer : public Converter {
  private:
-  unsigned second;
+  unsigned long second;
   std::string in;
   std::string out;
 
  public:
   void convert();
-  Mixer(std::string filename_in, std::string filename_out, unsigned sec);
+  Mixer(std::string filename_in, std::string filename_out, unsigned long sec);
   Mixer(std::string filename_in, std::string filename_out);
   ~Mixer();
 };

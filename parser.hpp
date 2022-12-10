@@ -9,9 +9,9 @@ class Parser {
  private:
   std::ofstream output_file;
   std::ifstream input_file;
-  unsigned bytes_sec_s;
-  unsigned bytes_sec_e;
-  unsigned byte_after_data;
+  unsigned long bytes_sec_s;
+  unsigned long bytes_sec_e;
+  unsigned long byte_after_data;
   struct WAVheader {
     char chunk_id[4];
 
@@ -46,15 +46,15 @@ class Parser {
   WAVheader* header;
   bool find_list_in_header();
   bool check_input();
-  bool check_args(unsigned* shift, unsigned* bytes_to_change);
+  bool check_args(unsigned long* shift, unsigned long* bytes_to_change);
 
  public:
   Parser(std::string filename_in, std::string filename_out);
   Parser(std::string filename_in);
   ~Parser();
   unsigned long get_bytes_per_second();
-  void mute_samples(unsigned* shift, unsigned* bytes_to_change);  // mute
-  void copy_samples(unsigned* shift, unsigned* bytes_to_change);  // copy
+  void mute_samples(unsigned long* shift, unsigned long* bytes_to_change);  // mute
+  void copy_samples(unsigned long* shift, unsigned long* bytes_to_change);  // copy
 };
 
 #endif

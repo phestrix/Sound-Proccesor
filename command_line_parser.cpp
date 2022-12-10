@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "config_parser.hpp"
 #include "interface.hpp"
 
 static bool check_args(std::vector<std::string>* arr) {
@@ -42,7 +43,7 @@ Parser_cmd::Parser_cmd(int* ac, char* av[]) {
         "Too few arguments\nMust be 4 or more, for mode, inputs, output");
   }
   if (!check_args(&names)) throw std::invalid_argument("Wrong arguments");
-  Interface interface(names.at(4), names.at(3), names.at(5));
+  Interface interface(names);
 }
 
 Parser_cmd::~Parser_cmd() {}

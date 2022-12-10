@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-void Parser_cfg::parse_config_file() {
+bool Parser_cfg::parse_config_file() {
   std::string buf;
   char a = '#';
   while (config_file.good()) {
@@ -17,7 +17,7 @@ void Parser_cfg::parse_config_file() {
 
     // find number of stream and number, than push them to vector of pair
     if (buf.find(mix)) {
-      std::vector<unsigned> res;
+      std::vector<unsigned long> res;
       read_stream_and_second(&buf, &res);
       std::string tmp = "input";
       tmp.push_back(res.at(0));
@@ -25,30 +25,32 @@ void Parser_cfg::parse_config_file() {
       tmp.~basic_string();
       res.clear();
       buffer.push_back('x');
-    }
+    } else
 
-    // find seconds to mute and push them in vector of seconds
-    if (buf.find(mute)) {
-      std::vector<unsigned> res;
-      read_seconds(&buf, &res);
-      mute_seconds.push_back(res.at(0));
-      mute_seconds.push_back(res.at(1));
-      res.clear();
-      buffer.push_back('m');
-    }
+      // find seconds to mute and push them in vector of seconds
+      if (buf.find(mute)) {
+        std::vector<unsigned long> res;
+        read_seconds(&buf, &res);
+        mute_seconds.push_back(res.at(0));
+        mute_seconds.push_back(res.at(1));
+        res.clear();
+        buffer.push_back('m');
+      } else
+        return false;
   }
+  return true;
 };
 
-std::vector<unsigned>* Parser_cfg::read_seconds(std::string* str,
-                                                std::vector<unsigned>* res) {
+std::vector<unsigned long>* Parser_cfg::read_seconds(
+    std::string* str, std::vector<unsigned long>* res) {
   if (str->find(" ")) {
     size_t pos = str->find(" ");
     if (str->find(" ", pos + 1)) {
       size_t interval = str->find(" ", pos + 1);
-      unsigned number = 0;
-      unsigned pow = 1;
+      unsigned long number = 0;
+      unsigned long pow = 1;
       while (pos < interval) {
-        number += ((pow) * (unsigned)str->at(pos));
+        number += ((pow) * (unsigned long)str->at(pos));
         pow *= 10;
         ++pos;
       }
@@ -58,7 +60,7 @@ std::vector<unsigned>* Parser_cfg::read_seconds(std::string* str,
         pow = 1;
         number = 0;
         while (pos < str->length()) {
-          number += (pow) * (unsigned)str->at(pos);
+          number += (pow) * (unsigned long)str->at(pos);
           pow *= 10;
           ++pos;
         }
@@ -76,14 +78,14 @@ std::vector<unsigned>* Parser_cfg::read_seconds(std::string* str,
   }
 }
 
-std::vector<unsigned>* read_stream_and_second(std::string* str,
-                                              std::vector<unsigned>* res) {
+std::vector<unsigned long>* Parser_cfg::read_stream_and_second(
+    std::string* str, std::vector<unsigned long>* res) {
   if (!str || !res) {
     return NULL;  // null pointer in function
   }
   if (str->find("$")) {
-    unsigned number = 0;
-    unsigned pow = 1;
+    unsigned long number = 0;
+    unsigned long pow = 1;
     size_t pos = str->find("$") + 1;
     size_t interval = str->find(" ", pos - 1);
 
@@ -97,7 +99,7 @@ std::vector<unsigned>* read_stream_and_second(std::string* str,
 
     pos = str->length();
     while (pos > interval) {
-      number += (pow * (unsigned)str->at(pos));
+      number += (pow * (unsigned long)str->at(pos));
       pow *= 10;
       --pos;
     }
@@ -110,11 +112,13 @@ std::vector<unsigned>* read_stream_and_second(std::string* str,
   }
 }
 
-inline std::string Parser_cfg::get_conv() { return buffer; }
+std::string* Parser_cfg::get_conv() { return &buffer; }
 
-inline std::vector<unsigned> Parser_cfg::get_seconds() { return mute_seconds; }
+std::vector<unsigned long>* Parser_cfg::get_seconds() {
+  return &mute_seconds;
+}
 
-inline std::vector<std::pair<std::string, unsigned>>
+std::vector<std::pair<std::string, unsigned long>>*
 Parser_cfg::get_streams_and_seconds() {
-  return stream_seconds_for_mix;
+  return &stream_seconds_for_mix;
 }
