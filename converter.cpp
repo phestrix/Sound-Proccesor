@@ -35,18 +35,19 @@ void Muter::convert() {
 Muter::~Muter() {}
 
 Mixer::Mixer(std::string filename_in, std::string filename_out,
-             unsigned long sec)
-    : in(filename_in), out(filename_out), second(sec) {}
+             unsigned long s_sec, unsigned long e_sec)
+    : in(filename_in), out(filename_out), s_second(s_sec) {}
 
 Mixer::Mixer(std::string filename_in, std::string filename_out)
-    : in(filename_in), out(filename_out), second(0) {}
+    : in(filename_in), out(filename_out), s_second(0) {}
 
 Mixer::~Mixer() {}
 
 void Mixer::convert() {
   Parser parser(in, out);
   unsigned long bytes = 1 * parser.get_bytes_per_second();
-  for (unsigned long i = 0; i < second; ++i) {
+  unsigned long tmp = (unsigned long)parser.get_eof_byte();
+  for (unsigned long i = s_second; i < tmp; ++i) {
     parser.copy_samples(&i, &bytes);
   }
 }
