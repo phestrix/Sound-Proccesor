@@ -53,6 +53,7 @@ class Parser {
   Parser(std::string filename_in);
   ~Parser();
   unsigned long get_bytes_per_second();
+  size_t get_eof_byte();
   void mute_samples(unsigned long* shift, unsigned long* bytes_to_change);  // mute
   void copy_samples(unsigned long* shift, unsigned long* bytes_to_change);  // copy
 };
