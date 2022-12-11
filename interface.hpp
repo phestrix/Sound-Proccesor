@@ -20,9 +20,9 @@ class Interface {
  public:
   Interface(std::vector<std::string> inputs);
   ~Interface();
-  void do_conv(unsigned long number);
+  void do_conv();
   void call_muter(unsigned long number);
-  void call_mixer();
+  void call_mixer(unsigned long number);
 };
 
 #endif
