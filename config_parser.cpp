@@ -1,4 +1,5 @@
 #include "config_parser.hpp"
+
 static unsigned long parse_int(std::string s) {
   unsigned long elem = 0;
   if (s[0] == '$') {
@@ -101,3 +102,5 @@ int CFG::parse_args(std::string filename) {
   fin.close();
   return 0;
 }
+
+

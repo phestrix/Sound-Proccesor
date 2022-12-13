@@ -12,9 +12,9 @@ static bool check_args(std::vector<std::string>* arr) {
       return false;
     if (arr->at(i).find("out") && arr->at(i).find("in")) return false;
   }
-  if (!arr->at(2).find(".txt")) return false;
-  if (!arr->at(3).find(".wav")) return false;
-  if (!arr->at(4).find(".wav")) return false;
+  if (!arr->at(0).find(".txt")) return false;
+  if (!arr->at(1).find(".wav")) return false;
+  if (!arr->at(2).find(".wav")) return false;
   return true;
 }
 
@@ -38,7 +38,7 @@ Parser_cmd::Parser_cmd(int* ac, char* av[]) {
   if (need_help) {
     Helper help;
     help.~Helper();
-  };
+  }
   if (!run) throw std::invalid_argument("Wrong parameters");
   if (names.size() < 3) {
     throw std::invalid_argument(
