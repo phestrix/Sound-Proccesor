@@ -7,7 +7,10 @@
 Interface::Interface(std::vector<std::string> inputs) {
   for (auto it = inputs.begin(); it < inputs.end(); ++it) {
     if (it->find("config")) {
-      cfg_file = *it;
+      CFG parser;
+      if (!parser.parse_args(inputs[0])) {
+        throw std::invalid_argument("Something wrong in cfg file");
+      }
     } else {
       if (it->find("input") && it->find(".wav")) {
         input_files.push_back(*it);
@@ -18,13 +21,6 @@ Interface::Interface(std::vector<std::string> inputs) {
       }
     }
   }
-  Parser_cfg cfg(cfg_file);
-  if (!cfg.parse_config_file()) {
-    throw std::invalid_argument("Something wrong in cfg file");
-  }
-  mode = *cfg.get_conv();
-  seconds = *cfg.get_seconds();
-  stream_to_mix = *cfg.get_streams_and_seconds();
 }
 
 Interface::~Interface() {}
@@ -36,20 +32,27 @@ static void rstr_pop(std::string* str) {
 }
 
 void Interface::do_conv() {
-  for (unsigned long i = 0; i < input_files.size(); ++i) {
-    char tmp = mode.at(0);
-    rstr_pop(&mode);
-    if (tmp == 'x') {
-      call_mixer(i);
+  for (size_t i = 0; i < data.size(); ++i) {
+    if (data[i].first == "mute") {
+      factory.add<Muter>(std::to_string(i));
+      Converter* mute = factory.get(std::to_string(i))(
+          input_files[i], output_file, data[i].second.at(0),
+          data[i].second.at(1));
+      mute->convert();
+      delete mute;
+
     } else {
-      if (tmp == 'm') {
-        call_muter(i);
-      }
+      factory.add<Mixer>(std::to_string(i));
+      Converter* mix = factory.get(std::to_string(i))(
+          input_files[i], output_file, data[i].second.at(0),
+          data[i].second.at(1));
+      mix->convert();
+      delete mix;
     }
   }
 }
 
-void Interface::call_mixer(unsigned long number) {
+/*void Interface::call_mixer(unsigned long number) {
   factory.add<Mixer>("Mixer");
   Converter* mixer = factory.get("Mixer")(
       this->stream_to_mix[number].first, this->output_file,
@@ -63,4 +66,4 @@ void Interface::call_muter(unsigned long number) {
       factory.get("Muter")(this->input_files[number], this->output_file,
                            this->seconds[0], this->seconds[1]);
   muter->convert();
-}
+}*/

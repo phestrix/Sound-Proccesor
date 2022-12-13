@@ -8,11 +8,10 @@
 class Interface {
  private:
   std::vector<std::string> input_files;
-  std::string cfg_file;
   std::string output_file;
-  std::string mode;
-  std::vector<unsigned long> seconds;
-  std::vector<std::pair<std::string, unsigned long>> stream_to_mix;
+  std::vector<std::pair<std::string, std::vector<unsigned long>>> data;
+ // std::vector<unsigned long> seconds;//for mute
+ // std::vector<std::pair<std::string, std::pair<unsigned long, unsigned long>>> stream_to_mix;//for mix
   Factory<std::string, Converter, std::string, std::string, unsigned long,
           unsigned long>
       factory;

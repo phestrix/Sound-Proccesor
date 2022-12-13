@@ -28,6 +28,7 @@ class Muter : public Converter {
 class Mixer : public Converter {
  private:
   unsigned long s_second;
+  unsigned long e_second;
   std::string in;
   std::string out;
 
@@ -35,7 +36,7 @@ class Mixer : public Converter {
   void convert();
   Mixer(std::string filename_in, std::string filename_out, unsigned long s_sec,
         unsigned long e_sec);
-  Mixer(std::string filename_in, std::string filename_out);
+  Mixer(std::string filename_in, std::string filename_out, unsigned long e_sec);
   ~Mixer();
 };
 

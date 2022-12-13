@@ -1,124 +1,103 @@
 #include "config_parser.hpp"
+static unsigned long parse_int(std::string s) {
+  unsigned long elem = 0;
+  if (s[0] == '$') {
+    s = s.substr(1, s.length());
+  }
 
-#include <cstring>
-
-bool Parser_cfg::parse_config_file() {
-  std::string buf;
-  char a = '#';
-  while (config_file.good()) {
-    std::getline(config_file, buf);
-    if (buf.at(0) == a) {
-      buf.clear();
-      std::getline(config_file, buf);
+  unsigned long ten_deg = 1;
+  for (size_t h = 0; h < s.length(); h++) {
+    if (!(s[s.length() - 1 - h] - 48 >= 0 && s[s.length() - 1 - h] - 48 <= 9)) {
+      throw std::invalid_argument(
+          "Exception: Wrong parameters format (must be integer)");
     }
 
-    std::string mix = "mix";
-    std::string mute = "mute";
-
-    // find number of stream and number, than push them to vector of pair
-    if (buf.find(mix)) {
-      std::vector<unsigned long> res;
-      read_stream_and_second(&buf, &res);
-      std::string tmp = "input";
-      tmp.push_back(res.at(0));
-      stream_seconds_for_mix.push_back(std::make_pair(tmp, res.at(1)));
-      tmp.~basic_string();
-      res.clear();
-      buffer.push_back('x');
-    } else
-
-      // find seconds to mute and push them in vector of seconds
-      if (buf.find(mute)) {
-        std::vector<unsigned long> res;
-        read_seconds(&buf, &res);
-        mute_seconds.push_back(res.at(0));
-        mute_seconds.push_back(res.at(1));
-        res.clear();
-        buffer.push_back('m');
-      } else
-        return false;
+    elem += ten_deg * (unsigned long)(s[s.length() - 1 - h] - 48);
+    ten_deg *= 10;
   }
-  return true;
-};
+  return elem;
+}
 
-std::vector<unsigned long>* Parser_cfg::read_seconds(
-    std::string* str, std::vector<unsigned long>* res) {
-  if (str->find(" ")) {
-    size_t pos = str->find(" ");
-    if (str->find(" ", pos + 1)) {
-      size_t interval = str->find(" ", pos + 1);
-      unsigned long number = 0;
-      unsigned long pow = 1;
-      while (pos < interval) {
-        number += ((pow) * (unsigned long)str->at(pos));
-        pow *= 10;
-        ++pos;
+unsigned long CFG::parse_str(const std::string &s) {
+  if (s.length() < 6) {
+    throw std::invalid_argument("Exception: Wrong length of config's string");
+  }
+
+  if (s.substr(0, 5) == "mute ") {
+    std::string s1 = s.substr(5, s.length());
+    std::size_t k = s1.find(' ');
+
+    if (k == std::string::npos) {
+      throw std::invalid_argument(
+          "Exception: Wrong config's string (count of mute parameters must be "
+          "2)");
+    }
+
+    std::string s2 = s1.substr(0, k), s3 = s1.substr(k + 1, s1.length());
+    unsigned long res1 = parse_int(s2), res2 = parse_int(s3);
+    std::pair<std::string, std::vector<unsigned long>> el;
+    el.first = "mute";
+    std::vector<unsigned long> params;
+    params.push_back(res1);
+    params.push_back(res2);
+    el.second = params;
+    data.push_back(el);
+
+  } else if (s.substr(0, 4) == "mix ") {
+    std::string s1 = s.substr(4, s.length());
+    std::size_t k = s1.find(' ');
+
+    if (k == std::string::npos) {
+      throw std::invalid_argument(
+          "Exception: Wrong config's string (count of mix parameters must be "
+          "2)");
+    }
+
+    std::string s2 = s1.substr(0, k), s3 = s1.substr(k + 1, s1.length());
+    unsigned long res1 = parse_int(s2), res2 = parse_int(s3);
+    std::pair<std::string, std::vector<unsigned long>> el;
+    el.first = "mix";
+    std::vector<unsigned long> params;
+    params.push_back(res1);
+    params.push_back(res2);
+    el.second = params;
+    data.push_back(el);
+  }
+
+  else
+    throw std::invalid_argument(
+        "Exception: Wrong config's string (must be mute or mix)");
+
+  return 0;
+}
+
+CFG::CFG() {}
+CFG::~CFG() {}
+
+int CFG::parse_args(std::string filename) {
+  std::ifstream fin;
+  fin.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  std::string cur_s;
+
+  try {
+    std::string f = filename;
+    fin.open(f);
+  } catch (std::ifstream::failure &e) {
+    throw std::invalid_argument("Exception: Wrong path to configs");
+  }
+
+  bool end = false;
+  while (!end) {
+    try {
+      getline(fin, cur_s);
+      if (cur_s.length() >= 1 && cur_s[0] != '#') {
+        parse_str(cur_s);
       }
-      res->push_back(number);
-      if (str->find(" ", interval + 1)) {
-        pos = str->find(" ", interval + 1);
-        pow = 1;
-        number = 0;
-        while (pos < str->length()) {
-          number += (pow) * (unsigned long)str->at(pos);
-          pow *= 10;
-          ++pos;
-        }
-        res->push_back(number);
-        return res;
-      } else {
-        res->push_back(UINT32_MAX);
-        return res;
-      }
-    } else {
-      return NULL;
+
+    } catch (std::ifstream::failure &e) {
+      end = true;
     }
-  } else {
-    return NULL;
   }
-}
-
-std::vector<unsigned long>* Parser_cfg::read_stream_and_second(
-    std::string* str, std::vector<unsigned long>* res) {
-  if (!str || !res) {
-    return NULL;  // null pointer in function
-  }
-  if (str->find("$")) {
-    unsigned long number = 0;
-    unsigned long pow = 1;
-    size_t pos = str->find("$") + 1;
-    size_t interval = str->find(" ", pos - 1);
-
-    if (pos == interval) {
-      return NULL;  // case if "mix $ ..., need mix $(number) ..."
-    }
-
-    if (str->find(" ", interval) == str->length()) {
-      return NULL;  // case if no seconds after number of stream
-    }
-
-    pos = str->length();
-    while (pos > interval) {
-      number += (pow * (unsigned long)str->at(pos));
-      pow *= 10;
-      --pos;
-    }
-
-    res->push_back(number);
-    return res;
-
-  } else {
-    return NULL;
-  }
-}
-
-std::string* Parser_cfg::get_conv() { return &buffer; }
-
-std::vector<unsigned long>* Parser_cfg::get_seconds() {
-  return &mute_seconds;
-}
-
-std::vector<std::pair<std::string, unsigned long>>*
-Parser_cfg::get_streams_and_seconds() {
-  return &stream_seconds_for_mix;
+  fin.close();
+  return 0;
 }
