@@ -1,7 +1,7 @@
 #include "command_line_parser.hpp"
 
 #include <vector>
-
+#include "helper.hpp"
 #include "config_parser.hpp"
 #include "interface.hpp"
 
@@ -36,6 +36,8 @@ Parser_cmd::Parser_cmd(int* ac, char* av[]) {
       run = true;
   }
   if (need_help) {
+    Helper help;
+    help.~Helper();
   };
   if (!run) throw std::invalid_argument("Wrong parameters");
   if (names.size() < 3) {
