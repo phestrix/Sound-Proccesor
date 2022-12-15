@@ -18,8 +18,9 @@ class Interface {
   Interface(std::vector<std::string> inputs);
   ~Interface();
   void do_conv();
-  void call_muter(unsigned long number);
-  void call_mixer(unsigned long number);
+  void set_data(std::vector<std::pair<std::string, std::vector<unsigned long>>> data);
+  //void call_muter(unsigned long number);
+  //void call_mixer(unsigned long number);
 };
 
 #endif

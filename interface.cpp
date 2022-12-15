@@ -5,20 +5,17 @@
 #include "config_parser.hpp"
 
 Interface::Interface(std::vector<std::string> inputs) {
-  for (auto it = inputs.begin(); it < inputs.end(); ++it) {
-    if (it->find("config")) {
-      CFG parser;
-      if (!parser.parse_args(inputs[0])) {
+  for (size_t i = 0; i < inputs.size(); ++i) {
+    if (inputs[i].find("config.txt") != std::string::npos) {
+      CFG cfg;
+      if (cfg.parse_args(inputs[i])) {
         throw std::invalid_argument("Something wrong in cfg file");
       }
-    } else {
-      if (it->find("input") && it->find(".wav")) {
-        input_files.push_back(*it);
-      } else {
-        if (it->find("output") && it->find(".wav")) {
-          output_file = *it;
-        }
-      }
+      set_data(cfg.get_data());
+    } else if (inputs[i].find("input") != std::string::npos) {
+      input_files.push_back(inputs[i]);
+    } else if (inputs[i].find("output") != std::string::npos) {
+      output_file = inputs[i];
     }
   }
 }
@@ -42,6 +39,7 @@ void Interface::do_conv() {
       delete mute;
 
     } else {
+      std::cout << "2" << std::endl;
       factory.add<Mixer>(std::to_string(i));
       Converter* mix = factory.get(std::to_string(i))(
           input_files[i], output_file, data[i].second.at(0),
@@ -50,6 +48,11 @@ void Interface::do_conv() {
       delete mix;
     }
   }
+}
+
+void Interface::set_data(
+    std::vector<std::pair<std::string, std::vector<unsigned long>>> d) {
+  this->data = d;
 }
 
 /*void Interface::call_mixer(unsigned long number) {
