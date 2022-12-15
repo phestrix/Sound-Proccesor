@@ -1,13 +1,14 @@
 #include "command_line_parser.hpp"
 
 #include <vector>
-#include "helper.hpp"
+
 #include "config_parser.hpp"
+#include "helper.hpp"
 #include "interface.hpp"
 
 static bool check_args(std::vector<std::string>* arr) {
   for (size_t i = 0; i < arr->size(); ++i) {
-    if ((arr->at(0).find("out") || arr->at(i).find("in")) &&
+    if ((arr->at(0).find("out") || arr->at(i).find("in")) ||
         (arr->at(0).find("conf") || arr->at(i).find("cfg")))
       return false;
     if (arr->at(i).find("out") && arr->at(i).find("in")) return false;
@@ -44,9 +45,10 @@ Parser_cmd::Parser_cmd(int* ac, char* av[]) {
     throw std::invalid_argument(
         "Too few arguments\nMust be 4 or more, for mode, inputs, output");
   }
-  if (!check_args(&names)) throw std::invalid_argument("Wrong arguments");
+  // if (!check_args(&names)) throw std::invalid_argument("Wrong arguments");
   Interface interface(names);
   interface.do_conv();
+  
 }
 
 Parser_cmd::~Parser_cmd() {}
