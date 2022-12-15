@@ -15,6 +15,7 @@ class CFG {
   CFG();
   ~CFG();
   int parse_args(std::string filename);
+  std::vector<std::pair<std::string, std::vector<unsigned long>>> get_data();
 };
 
 #endif

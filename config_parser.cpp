@@ -81,8 +81,7 @@ int CFG::parse_args(std::string filename) {
   std::string cur_s;
 
   try {
-    std::string f = filename;
-    fin.open(f);
+    fin.open(filename);
   } catch (std::ifstream::failure &e) {
     throw std::invalid_argument("Exception: Wrong path to configs");
   }
@@ -103,4 +102,7 @@ int CFG::parse_args(std::string filename) {
   return 0;
 }
 
-
+std::vector<std::pair<std::string, std::vector<unsigned long>>>
+CFG::get_data() {
+  return data;
+}
