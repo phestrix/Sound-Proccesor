@@ -19,7 +19,7 @@ void Converter::mute_sample(unsigned start, unsigned end) {
 }*/
 
 Muter::Muter(std::string filename_in, std::string filename_out,
-             unsigned long s_sec, unsigned long e_sec)
+             unsigned int s_sec, unsigned int e_sec)
     : input_file(filename_in),
       ouput_file(filename_out),
       start(s_sec),
@@ -35,13 +35,13 @@ void Muter::convert() {
 Muter::~Muter() {}
 
 Mixer::Mixer(std::string filename_in, std::string filename_out,
-             unsigned long s_sec, unsigned long e_sec)
+             unsigned int s_sec, unsigned int e_sec)
     : in(filename_in), out(filename_out), s_second(s_sec), e_second(e_sec) {
       
     }
 
 Mixer::Mixer(std::string filename_in, std::string filename_out,
-             unsigned long e_sec)
+             unsigned int e_sec)
     : in(filename_in), out(filename_out), s_second(0), e_second(e_sec) {
       
     }
@@ -50,11 +50,11 @@ Mixer::~Mixer() {}
 
 void Mixer::convert() {
   Parser parser(in, out);
-  unsigned long bytes = 1 * parser.get_bytes_per_second();
+  unsigned int bytes = 1 * parser.get_bytes_per_second();
   // unsigned long tmp = (unsigned long)parser.get_eof_byte();
-  unsigned long tmp = e_second * parser.get_bytes_per_second();
+  unsigned int tmp = e_second * parser.get_bytes_per_second();
 
-  for (unsigned long i = s_second; i < tmp; ++i) {
+  for (unsigned int i = s_second; i < tmp; ++i) {
     parser.copy_samples(&i, &bytes);
   }
 }

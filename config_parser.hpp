@@ -8,14 +8,14 @@
 
 class CFG {
  private:
-  std::vector<std::pair<std::string, std::vector<unsigned long>>> data;
-  unsigned long parse_str(const std::string &s);
+  std::vector<std::pair<std::string, std::vector<unsigned int>>> data;
+  unsigned int parse_str(const std::string &s);
 
  public:
   CFG();
   ~CFG();
   int parse_args(std::string filename);
-  std::vector<std::pair<std::string, std::vector<unsigned long>>> get_data();
+  std::vector<std::pair<std::string, std::vector<unsigned int>>> get_data();
 };
 
 #endif

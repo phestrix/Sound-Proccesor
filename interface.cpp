@@ -39,7 +39,7 @@ void Interface::do_conv() {
       delete mute;
 
     } else {
-      std::cout << "2" << std::endl;
+     // std::cout << "2" << std::endl;
       factory.add<Mixer>(std::to_string(i));
       Converter* mix = factory.get(std::to_string(i))(
           input_files[i], output_file, data[i].second.at(0),
@@ -51,7 +51,7 @@ void Interface::do_conv() {
 }
 
 void Interface::set_data(
-    std::vector<std::pair<std::string, std::vector<unsigned long>>> d) {
+    std::vector<std::pair<std::string, std::vector<unsigned int>>> d) {
   this->data = d;
 }
 

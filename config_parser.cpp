@@ -1,25 +1,25 @@
 #include "config_parser.hpp"
 
-static unsigned long parse_int(std::string s) {
-  unsigned long elem = 0;
+static unsigned int parse_int(std::string s) {
+  unsigned int elem = 0;
   if (s[0] == '$') {
     s = s.substr(1, s.length());
   }
 
-  unsigned long ten_deg = 1;
+  unsigned int ten_deg = 1;
   for (size_t h = 0; h < s.length(); h++) {
     if (!(s[s.length() - 1 - h] - 48 >= 0 && s[s.length() - 1 - h] - 48 <= 9)) {
       throw std::invalid_argument(
           "Exception: Wrong parameters format (must be integer)");
     }
 
-    elem += ten_deg * (unsigned long)(s[s.length() - 1 - h] - 48);
+    elem += ten_deg * (unsigned int)(s[s.length() - 1 - h] - 48);
     ten_deg *= 10;
   }
   return elem;
 }
 
-unsigned long CFG::parse_str(const std::string &s) {
+unsigned int CFG::parse_str(const std::string &s) {
   if (s.length() < 6) {
     throw std::invalid_argument("Exception: Wrong length of config's string");
   }
@@ -35,10 +35,10 @@ unsigned long CFG::parse_str(const std::string &s) {
     }
 
     std::string s2 = s1.substr(0, k), s3 = s1.substr(k + 1, s1.length());
-    unsigned long res1 = parse_int(s2), res2 = parse_int(s3);
-    std::pair<std::string, std::vector<unsigned long>> el;
+    unsigned int res1 = parse_int(s2), res2 = parse_int(s3);
+    std::pair<std::string, std::vector<unsigned int>> el;
     el.first = "mute";
-    std::vector<unsigned long> params;
+    std::vector<unsigned int> params;
     params.push_back(res1);
     params.push_back(res2);
     el.second = params;
@@ -55,10 +55,10 @@ unsigned long CFG::parse_str(const std::string &s) {
     }
 
     std::string s2 = s1.substr(0, k), s3 = s1.substr(k + 1, s1.length());
-    unsigned long res1 = parse_int(s2), res2 = parse_int(s3);
-    std::pair<std::string, std::vector<unsigned long>> el;
+    unsigned int res1 = parse_int(s2), res2 = parse_int(s3);
+    std::pair<std::string, std::vector<unsigned int>> el;
     el.first = "mix";
-    std::vector<unsigned long> params;
+    std::vector<unsigned int> params;
     params.push_back(res1);
     params.push_back(res2);
     el.second = params;
@@ -102,7 +102,7 @@ int CFG::parse_args(std::string filename) {
   return 0;
 }
 
-std::vector<std::pair<std::string, std::vector<unsigned long>>>
+std::vector<std::pair<std::string, std::vector<unsigned int>>>
 CFG::get_data() {
   return data;
 }
