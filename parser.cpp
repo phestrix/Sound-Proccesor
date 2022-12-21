@@ -6,10 +6,10 @@
 #include <iostream>
 
 // defalut constructor
-Parser::Parser(std::string file_in, std::string file_out) {
-  in = fopen(file_in.c_str(), "rb");
+Parser::Parser(FILE* file_in, FILE* file_out) {
+  in = file_in;
 
-  FILE* tmp = fopen(file_out.c_str(), "rb");
+  FILE* tmp = file_out;
   byte_after_data_out = parse(tmp);
   out = fopen("output.wav", "wb");
 
@@ -23,8 +23,8 @@ Parser::Parser(std::string file_in, std::string file_out) {
 }
 
 // constructor if no out file
-Parser::Parser(std::string filename) {
-  in = fopen(filename.c_str(), "rb");
+Parser::Parser(FILE* filename) {
+  in = filename;
   char* data = (char*)malloc(20);
 
   out = fopen("out.wav", "wb");
@@ -76,8 +76,6 @@ int Parser::mix(int start, int end) {
     return OPEN_ERROR;
   }
 
-  // int a,b;
-
   if (fseek(in, start + byte_after_data_in, SEEK_SET)) {
     return SEEK_ERROR;
   }
@@ -108,10 +106,4 @@ int Parser::mute(int start, int end) {
   }
 
   return SUCCESS;
-}
-
-int main(void) {
-  Parser prs("input1.wav", "input2.wav");
-  int a = prs.mix(0, 10);
-  std::cout << a << std::endl;
 }

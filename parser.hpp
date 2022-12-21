@@ -45,8 +45,8 @@ class Parser {
   int parse(FILE* file);
 
  public:
-  Parser(std::string filename);
-  Parser(std::string file_in, std::string file_out);
+  Parser(FILE* filename);
+  Parser(FILE* file_in, FILE* file_out);
   ~Parser();
   int mute(int start, int end);
   int mix(int start, int end);
