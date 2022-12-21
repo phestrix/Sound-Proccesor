@@ -1,216 +1,117 @@
 #include "parser.hpp"
 
+#include <stdio.h>
+
 #include <cstring>
 #include <iostream>
-#define CONST_HEAD_SIZE 44
-
-// loop that fill char* fields in WAVheader from buffer
-// than increase precision
-static void loop(size_t* prec, char* s1, char* s2, size_t end_of_loop) {
-  if (!s1 || !s2) {
-    throw std::invalid_argument("Empty buffers in loop");
-  }
-  for (size_t i = 0; i < end_of_loop; ++i) {
-    s1[i] = s2[i + *prec];
-  }
-  *prec += end_of_loop;
-  if (*prec >= 44) {
-    throw std::invalid_argument("Something wrong in precision in parser");
-  }
-}
-
-// cast to typename of field( from WAVheader) from buffer
-// than increase precision
-template <typename T>
-void cast_to(T val, char* s, size_t* prec) {
-  if (!s) {
-    throw std::invalid_argument("empty buffer in cast");
-  }
-  val = (T) * (&s[*prec]);
-  *prec += sizeof(T);
-  // std::cout << typeid(val).name() << " " << sizeof(T) << " " <<
-  // sizeof(unsigned int) << std::endl;
-
-  if (*prec > 44) {
-    throw std::invalid_argument("Something wrong in precision in parser");
-  }
-}
-
-static WAVheader* parse(char* buf) {
-  WAVheader* res = (WAVheader*)malloc(CONST_HEAD_SIZE);
-  size_t precision = 0;
-  loop(&precision, res->chunk_id, buf, 4);                         // 4
-  cast_to<unsigned int>(res->chunk_size, buf, &precision);         // 8
-  loop(&precision, res->format, buf, 4);                           // 12
-  loop(&precision, res->subchunk1_id, buf, 4);                     // 16
-  cast_to<unsigned int>(res->subchunk1_size, buf, &precision);     // 20
-  cast_to<unsigned short>(res->audio_format, buf, &precision);     // 22
-  cast_to<unsigned short>(res->num_channels, buf, &precision);     // 24
-  cast_to<unsigned int>(res->sample_rate, buf, &precision);        // 28
-  cast_to<unsigned int>(res->byte_rate, buf, &precision);          // 32
-  cast_to<unsigned short>(res->block_align, buf, &precision);      // 34
-  cast_to<unsigned short>(res->bits_per_sample, buf, &precision);  // 36
-  loop(&precision, res->subchunk2_id, buf, 4);                     // 40
-  cast_to<unsigned int>(res->subchunk2_size, buf, &precision);     // 44
-  return res;
-};
 
 // defalut constructor
-Parser::Parser(std::string filename_in, std::string filename_out) {
-  char* tmp = new char[CONST_HEAD_SIZE];
-  input_file.open(filename_in);
-  input_file.read(tmp, CONST_HEAD_SIZE);
-  std::ofstream log("log.txt");
-  log.write(tmp, CONST_HEAD_SIZE);
-  header = parse(tmp);
-  delete[] tmp;
-  if (!check_input()) {
-    throw std::invalid_argument("not able to find \"data\" chunk");
+Parser::Parser(std::string file_in, std::string file_out) {
+  in = fopen(file_in.c_str(), "rb");
+
+  FILE* tmp = fopen(file_out.c_str(), "rb");
+  byte_after_data_out = parse(tmp);
+  out = fopen("output.wav", "wb");
+
+  char* data = (char*)malloc(20);
+  while (fread(data, 1, 20, tmp) > 0) {
+    fwrite(data, 1, 20, out);
   }
 
-  output_file.open(filename_out);
+  byte_after_data_in = parse(in);
+  fclose(tmp);
 }
 
 // constructor if no out file
-Parser::Parser(std::string filename_in) {
-  char* tmp = new char[CONST_HEAD_SIZE];
-  input_file.open(filename_in);
-  input_file.read(tmp, CONST_HEAD_SIZE);
+Parser::Parser(std::string filename) {
+  in = fopen(filename.c_str(), "rb");
+  char* data = (char*)malloc(20);
 
-  header = parse(tmp);
-  delete[] tmp;
-  if (!check_input()) {
-    throw std::invalid_argument("not able to find \"data\" chunk");
+  out = fopen("out.wav", "wb");
+  while (fread(data, 20, 1, in) > 0) {
+    fwrite(data, 20, 1, out);
   }
-
-  output_file.open(filename_in + "out");
-  output_file.write(tmp, CONST_HEAD_SIZE);
+  parse(in);
+  free(data);
 }
 
 // destructor
 Parser::~Parser() {
-  if (input_file.is_open()) {
-    input_file.close();
-  }
-  if (output_file.is_open()) {
-    output_file.close();
-  }
-  if (header) {
-    free(header);
-  }
+  if (in) fclose(in);
+  if (out) fclose(out);
 }
 
-bool Parser::check_input() {
-  
-  if (!strcmp(header->chunk_id, "RIFF")) {
-    return false;
-  }
-  std::cout << header->chunk_id << std::endl;
-  if (!strcmp(header->format, "WAVE")) {
-    return false;
-  }
-  if (!strcmp(header->subchunk1_id, "fmt ")) {
-    return false;
-  }
-  if (header->subchunk1_size != 16) {
-    std::cout << header->subchunk1_size << std::endl;
-    return false;
-  }
-  if (header->audio_format != 1) {
-    std::cout << "5" << std::endl;
-    return false;
-  }
-  if (header->num_channels != 1) {
-    std::cout << "6" << std::endl;
-    return false;
-  }
-  if (header->sample_rate != 44100) {
-    return false;
-  }
-  if (header->bits_per_sample != 16) {
-    return false;
-  }
-  if (!strcmp(header->subchunk2_id, "data")) {
-    while (input_file.good()) {
-      find_data_in_header();
+// parsing header of WAV file
+int Parser::parse(FILE* file) {
+  int res = 0;
+  FILE* f = file;
+  fseek(f, 0, SEEK_SET);
+  fread(&header, sizeof(header), 1, f);
+  fseek(f, header.fLen - 16,
+        SEEK_CUR);  // skip wExtraFormatBytes & extra format bytes
+  chunk_t chunk;
+  while (true) {  // go to data chunk
+
+    fread(&chunk, sizeof(chunk), 1, f);
+    if (*(int*)&chunk.id == 0x61746164) {
+      res = ftell(f) + 8;
+      break;
     }
-    if (!strcmp(header->subchunk2_id, "data")) {
-      return false;
-    }
+
+    fseek(f, chunk.size, SEEK_CUR);  // skip chunk data bytes
   }
-  return true;
+  fseek(f, 0, SEEK_SET);
+  return res;
 }
 
-bool Parser::find_data_in_header() {
-  char* buf = new char[4];
-  input_file.read(buf, 4);
-  if (!strcmp(buf, "data")) {
-    input_file.seekg(1);
-    return false;
+// for mix need to copy data from one stream
+// and paste it to another
+// in the same place
+int Parser::mix(int start, int end) {
+  if (!in) {
+    return OPEN_ERROR;
   }
-  byte_after_data = input_file.tellg();
-  for (size_t i = 0; i < 4; ++i) {
-    header->subchunk2_id[i] = buf[i];
+
+  if (!out) {
+    return OPEN_ERROR;
   }
-  input_file.seekg(4);
-  input_file.read(buf, 4);
-  header->subchunk2_size = (unsigned int)*(&buf[0]);
-  delete[] buf;
-  return true;
+
+  // int a,b;
+
+  if (fseek(in, start + byte_after_data_in, SEEK_SET)) {
+    return SEEK_ERROR;
+  }
+
+  if (fseek(out, start + byte_after_data_out, SEEK_SET)) {
+    return SEEK_ERROR;
+  }
+
+  for (int i = start; i < end * header.nAvgBytesPerSec; ++i) {
+    int a = fgetc(in);
+    fputc(a, out);
+  }
+
+  return SUCCESS;
 }
 
-unsigned int Parser::get_bytes_per_second() { return header->byte_rate; }
+int Parser::mute(int start, int end) {
+  if (!out) {
+    return OPEN_ERROR;
+  }
 
-bool Parser::check_args(unsigned int* shift, unsigned int* bytes_to_change) {
-  size_t check = get_eof_byte();
-  if ((*shift) > check) {
-    return false;
+  if (fseek(out, byte_after_data_in + start, SEEK_SET)) {
+    return SEEK_ERROR;
   }
-  if (*bytes_to_change > check) {
-    return false;
+
+  for (int i = start; i < end * header.nAvgBytesPerSec; ++i) {
+    fputc(0, out);
   }
-  if ((*shift + *bytes_to_change) > check) {
-    *bytes_to_change = (check - *shift);
-  }
-  return true;
+
+  return SUCCESS;
 }
 
-// mute
-void Parser::mute_samples(unsigned int* shift, unsigned int* bytes_to_change) {
-  if (!check_args(shift, bytes_to_change)) {
-    throw std::invalid_argument("file doesnt contain this amount of seconds");
-    return;
-  }
-
-  input_file.seekg(*shift + byte_after_data);
-  output_file.seekp(*shift + byte_after_data);
-  char* tmp_block = new char[*bytes_to_change];
-  for (size_t i = 0; i < *bytes_to_change; ++i) {
-    tmp_block[i] ^= tmp_block[i];
-  }
-  output_file.write(tmp_block, *bytes_to_change);
-  delete[] tmp_block;
-}
-
-// copy
-void Parser::copy_samples(unsigned int* shift, unsigned int* bytes_to_change) {
-  if (!check_args(shift, bytes_to_change)) {
-    throw std::invalid_argument("file doesnt contain this amount of seconds");
-    return;
-  }
-
-  input_file.seekg(*shift + byte_after_data);
-  char* tmp = new char[*bytes_to_change];
-  input_file.read(tmp, *bytes_to_change);
-  output_file.seekp(*shift + byte_after_data);
-  output_file.write(tmp, *shift);
-  delete[] tmp;
-}
-
-size_t Parser::get_eof_byte() {
-  size_t tmp = input_file.tellg();
-  input_file.seekg(0, std::ios::end);
-  size_t check = input_file.tellg();
-  input_file.seekg(tmp);
-  return check;
+int main(void) {
+  Parser prs("input1.wav", "input2.wav");
+  int a = prs.mix(0, 10);
+  std::cout << a << std::endl;
 }

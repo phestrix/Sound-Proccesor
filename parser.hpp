@@ -1,65 +1,55 @@
 #ifndef PARSER
 #define PARSER
-#include <bitset>
+#include <stdio.h>
+
 #include <fstream>
 #include <string>
 #include <vector>
 
-struct WAVheader {
-    char chunk_id[4];
+#define SUCCESS 0
+#define OPEN_ERROR 1
+#define MEM_ERROR 2
+#define SEEK_ERROR 3
+#define IO_ERROR 4
 
-    unsigned int chunk_size;
+struct wav_header_t {
+  char rId[4];  //"RIFF" = 0x46464952
+  int rLen;     // 28 [+ sizeof(wExtraFormatBytes) + wExtraFormatBytes] +
+                // sum(sizeof(chunk.id) + sizeof(chunk.size) + chunk.size)
+  char wId[4];  //"WAVE" = 0x45564157
+  char fId[4];  //"fmt " = 0x20746D66
+  int fLen;     // 16 [+ sizeof(wExtraFormatBytes) + wExtraFormatBytes]
+  short wFormatTag;
+  short nChannels;
+  int nSamplesPerSec;
+  int nAvgBytesPerSec;
+  short nBlockAlign;
+  short wBitsPerSample;
+  //[short wExtraFormatBytes;]
+  //[Extra format bytes]
+};
 
-    char format[4];
-
-    char subchunk1_id[4];
-
-    unsigned int subchunk1_size;
-
-    unsigned short audio_format;
-
-    unsigned short num_channels;
-
-    unsigned int sample_rate;
-
-    unsigned int byte_rate;  // bytes per second
-
-    unsigned short block_align;
-
-    unsigned short bits_per_sample;
-
-    char subchunk2_id[4];
-
-    unsigned int subchunk2_size;  // next bytes from 44 is samples
-    /*
-    if want to mute for 1 sec, than mute byte_rate * 1
-    */
-  };
+struct chunk_t {
+  char id[4];  //"data" = 0x61746164
+  int size;
+  // Chunk data bytes
+};
 
 class Parser {
  private:
-  std::ofstream output_file;
-  std::ifstream input_file;
-  unsigned int bytes_sec_s;
-  unsigned int bytes_sec_e;
-  unsigned int byte_after_data;
-
-
-  WAVheader* header;
-  bool find_data_in_header();
-  bool check_input();
-  bool check_args(unsigned int* shift, unsigned int* bytes_to_change);
+  wav_header_t header;
+  FILE* in;
+  FILE* out;
+  int byte_after_data_in;
+  int byte_after_data_out;
+  int parse(FILE* file);
 
  public:
-  Parser(std::string filename_in, std::string filename_out);
-  Parser(std::string filename_in);
+  Parser(std::string filename);
+  Parser(std::string file_in, std::string file_out);
   ~Parser();
-  unsigned int get_bytes_per_second();
-  size_t get_eof_byte();
-  void mute_samples(unsigned int* shift,
-                    unsigned int* bytes_to_change);  // mute
-  void copy_samples(unsigned int* shift,
-                    unsigned int* bytes_to_change);  // copy
+  int mute(int start, int end);
+  int mix(int start, int end);
 };
 
 #endif
