@@ -19,8 +19,7 @@ class Muter : public Converter {
   int end;
 
  public:
-  Muter(FILE* filename_in, FILE* filename_out, int s_sec,
-        int e_sec);
+  Muter(FILE* filename_in, FILE* filename_out, int s_sec, int e_sec);
   void convert();
   ~Muter();
 };

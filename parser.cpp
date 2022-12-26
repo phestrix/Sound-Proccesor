@@ -5,24 +5,20 @@
 #include <cstring>
 #include <iostream>
 
-// defalut constructor
+/// @brief defalut constructor
+/// @param file_in file for input, where to read
+/// @param file_out file for ouput, where to write
 Parser::Parser(FILE* file_in, FILE* file_out) {
   in = file_in;
 
   FILE* tmp = file_out;
   byte_after_data_out = parse(tmp);
-  out = fopen("output.wav", "wb");
-
-  char* data = (char*)malloc(20);
-  while (fread(data, 1, 20, tmp) > 0) {
-    fwrite(data, 1, 20, out);
-  }
 
   byte_after_data_in = parse(in);
   fclose(tmp);
 }
 
-// constructor if no out file
+/// @brief constructor if no out file
 Parser::Parser(FILE* filename) {
   in = filename;
   char* data = (char*)malloc(20);
@@ -41,7 +37,7 @@ Parser::~Parser() {
   if (out) fclose(out);
 }
 
-// parsing header of WAV file
+/// @brief parsing header of WAV file
 int Parser::parse(FILE* file) {
   int res = 0;
   FILE* f = file;
@@ -64,9 +60,9 @@ int Parser::parse(FILE* file) {
   return res;
 }
 
-// for mix need to copy data from one stream
-// and paste it to another
-// in the same place
+/// @brief  mix need to copy data from one stream,  paste it to another in the same place
+/// @param start second when start mixing
+/// @param end second when end mixing
 int Parser::mix(int start, int end) {
   if (!in) {
     return OPEN_ERROR;
@@ -91,7 +87,9 @@ int Parser::mix(int start, int end) {
 
   return SUCCESS;
 }
-
+/// @brief func that mute some seconds, xor some bytes, based on average bytes per second chunk
+/// @param start second where to start muting
+/// @param end second where to end muting
 int Parser::mute(int start, int end) {
   if (!out) {
     return OPEN_ERROR;

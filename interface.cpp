@@ -1,5 +1,6 @@
 #include "interface.hpp"
-
+/// @brief default costructor, trying to parse files in input
+/// @param inputs vector of string that containg names of files 
 Interface::Interface(std::vector<std::string> inputs) {
   for (size_t i = 0; i < inputs.size(); ++i) {
     if (inputs[i].find("config.txt") != std::string::npos) {
@@ -8,7 +9,7 @@ Interface::Interface(std::vector<std::string> inputs) {
       if (cfg.parse_args(inputs[i])) {
         throw std::invalid_argument("Something wrong in cfg file");
       }
-      
+
       set_data(cfg.get_data());
 
     } else if (inputs[i].find("input") != std::string::npos) {
@@ -21,7 +22,6 @@ Interface::Interface(std::vector<std::string> inputs) {
 }
 
 Interface::~Interface() {
-
   if (output) {
     fclose(output);
   }
@@ -31,7 +31,6 @@ Interface::~Interface() {
       fclose(it);
     }
   }
-
 }
 
 void Interface::do_conv() {
@@ -51,9 +50,7 @@ void Interface::do_conv() {
     } else {
       factory.add<Mixer>(std::to_string(i));
 
-      Converter* mix = factory.get(std::to_string(i))(
-          in_files[i], output, data[i].second.at(0),
-          data[i].second.at(1));
+      Converter* mix = factory.get(std::to_string(i))(in_files[i], output, data[i].second.at(0), data[i].second.at(1));
 
       mix->convert();
       delete mix;
