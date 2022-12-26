@@ -7,7 +7,7 @@ class MixConverter : public ConverterInterface {
  public:
   explicit MixConverter(ConverterParams params);
   ~MixConverter() override = default;
-  void Process(SampleBuffer& working_sample, const SampleVector& default_samples) override;
+  void Process(SampleBuffer &buf, const SampleVector& default_samples) override;
   FileLinks GetFileLinks() override;
 
  private:

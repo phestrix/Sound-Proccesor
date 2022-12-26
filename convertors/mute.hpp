@@ -7,7 +7,7 @@ class MuteConverter : public ConverterInterface {
  public:
   explicit MuteConverter(ConverterParams params);
   ~MuteConverter() override = default;
-  void Process(SampleBuffer& working_sample, const SampleVector& default_samples) override;
+  void Process(SampleBuffer& buf, const SampleVector& default_samples) override;
   FileLinks GetFileLinks() override;
 
  private:
