@@ -20,7 +20,7 @@ using ConverterPtr = std::unique_ptr<ConverterInterface>;
 class ConverterInterface {
  public:
   virtual ~ConverterInterface() = default;
-  virtual void Process(SampleBuffer& working_sample, const SampleVector& default_samples) = 0;
+  virtual void Process(SampleBuffer& buf, const SampleVector& default_samples) = 0;
   virtual FileLinks GetFileLinks() = 0;
   static ConverterPtr Create(ConverterCommand converter_command);
 };

@@ -3,6 +3,7 @@
 
 #include "convertors_interface.hpp"
 
+/// @brief Converter to mute interval in wav file
 class MuteConverter : public ConverterInterface {
  public:
   explicit MuteConverter(ConverterParams params);
