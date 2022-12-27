@@ -15,8 +15,8 @@ class WAVReader {
   bool ReadSample(SampleBuffer& sample_buffer);
 
  private:
-  std::ifstream fin_;
-  std::string file_path_;
+  std::ifstream m_fin;
+  std::string m_file_path;
 
   void SearchChunk(uint32_t chunk_ID);
   void ReadHeader();

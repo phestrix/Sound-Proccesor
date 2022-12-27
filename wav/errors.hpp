@@ -60,8 +60,7 @@ public:
 class ChunkNotFound : public IncorrectFileFormat
 {
 public:
-    explicit ChunkNotFound(const std::string & file_path,
-                           uint32_t chunk_ID);
+    explicit ChunkNotFound(const std::string & file_path, uint32_t chunk_ID);
 };
 
 

@@ -15,8 +15,8 @@ class WAVWriter {
   void WriteSample(SampleBuffer sample_buffer);
 
  private:
-  std::ofstream fout_;
-  std::string file_path_;
+  std::ofstream m_fout;
+  std::string m_file_path;
 
   void WriteHeader();
   void FixHeader();

@@ -18,19 +18,19 @@ const uint16_t BLOCK_ALIGN = BITS_PER_SAMPLE * NUM_CHANNELS / BITS_PER_BYTE;
 const uint32_t BYTE_RATE = BLOCK_ALIGN * SAMPLING_RATE;
 
 struct ChunkHeader {
-  uint32_t ID_;
-  uint32_t size_;
+  uint32_t m_ID;
+  uint32_t m_size;
 };
 
 using FormatType = uint32_t;
 
 struct FMTChunkData {
-  uint16_t audio_format_ = AUDIO_FORMAT_PCM;    // Audio format
-  uint16_t num_channels_ = NUM_CHANNELS;        // Channels number
-  uint32_t sampling_rate_ = SAMPLING_RATE;      // Sampling rate in Hz
-  uint32_t byte_rate_ = BYTE_RATE;              // Bytes number transmitted per second of playback
-  uint16_t block_align_ = BLOCK_ALIGN;          // Bytes number per sample
-  uint16_t bits_per_sample_ = BITS_PER_SAMPLE;  // Bits number in the sample (depth)
+  uint16_t m_audio_format = AUDIO_FORMAT_PCM;    // Audio format
+  uint16_t m_num_channels = NUM_CHANNELS;        // Channels number
+  uint32_t m_sampling_rate = SAMPLING_RATE;      // Sampling rate in Hz
+  uint32_t m_byte_rate = BYTE_RATE;              // Bytes number transmitted per second of playback
+  uint16_t m_block_align = BLOCK_ALIGN;          // Bytes number per sample
+  uint16_t m_bits_per_sample = BITS_PER_SAMPLE;  // Bits number in the sample (depth)
 };
 
 using Sample = int16_t;

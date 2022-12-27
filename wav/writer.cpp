@@ -1,101 +1,86 @@
-#include "iostream_errors.h"
-#include "errors.hpp"
 #include "writer.hpp"
 
-WAVWriter::WAVWriter(std::string file_path)
-{
-    Open(std::move(file_path));
+#include "errors.hpp"
+#include "../errors/io_errors.hpp"
+
+WAVWriter::WAVWriter(std::string file_path) {
+  Open(std::move(file_path));
 }
 
-WAVWriter::~WAVWriter()
-{
-    FixHeader();
+WAVWriter::~WAVWriter() {
+  FixHeader();
 }
 
-void WAVWriter::Open(std::string file_path)
-{
-    file_path_ = std::move(file_path);
+void WAVWriter::Open(std::string file_path) {
+  m_file_path = std::move(file_path);
 
-    // file opening
-    fout_.open(file_path_,
-               std::ios_base::binary);
-    if (!fout_.good())
-        throw FileNotOpen(file_path_);
+  // file opening
+  m_fout.open(m_file_path, std::ios_base::binary);
+  if (!m_fout.good())
+    throw FileNotOpen(m_file_path);
 
-    WriteHeader();
+  WriteHeader();
 }
 
-void WAVWriter::WriteSample(SampleBuffer sample_buffer)
-{
-    fout_.write((const char *)&sample_buffer[0],
-                sizeof(sample_buffer[0]) * sample_buffer.size());
+void WAVWriter::WriteSample(SampleBuffer sample_buffer) {
+  m_fout.write((const char *)&sample_buffer[0], sizeof(sample_buffer[0]) * sample_buffer.size());
 
-    if (!fout_.good())
-        throw FileNotWrite(file_path_);
+  if (!m_fout.good())
+    throw FileNotWrite(m_file_path);
 }
 
-void WAVWriter::WriteHeader()
-{
-    // write RIFF header
-    ChunkHeader RIFF_header = {
-        RIFF,
-        0
-    };
-    fout_.write((const char *)&RIFF_header,
-                sizeof(RIFF_header));
+void WAVWriter::WriteHeader() {
+  // write RIFF header
+  ChunkHeader RIFF_header = {
+      RIFF,
+      0};
 
-    // write format type
-    FormatType format_type = WAVE;
-    fout_.write((const char *)&format_type,
-                sizeof(format_type));
+  m_fout.write((const char *)&RIFF_header, sizeof(RIFF_header));
 
-    // write FMT header
-    ChunkHeader FMT_header = {
-        FMT_,
-        sizeof(FMTChunkData)
-    };
-    fout_.write((const char *)&FMT_header,
-                sizeof(FMT_header));
+  // write format type
+  FormatType format_type = WAVE;
+  m_fout.write((const char *)&format_type, sizeof(format_type));
 
-    // write FMT data
-    FMTChunkData fmt_data;
-    fout_.write((const char *)&fmt_data,
-                sizeof(fmt_data));
+  // write FMT header
+  ChunkHeader FMT_header = {
+      FMT_,
+      sizeof(FMTChunkData)};
 
-    // write DATA header
-    ChunkHeader data_header = {
-        DATA,
-        0
-    };
-    fout_.write((const char *)&data_header,
-                sizeof(data_header));
+  m_fout.write((const char *)&FMT_header, sizeof(FMT_header));
+
+  // write FMT data
+  FMTChunkData fmt_data;
+  m_fout.write((const char *)&fmt_data, sizeof(fmt_data));
+
+  // write DATA header
+  ChunkHeader data_header = {
+      DATA,
+      0};
+  m_fout.write((const char *)&data_header, sizeof(data_header));
 }
 
-void WAVWriter::FixHeader()
-{
-    // get file size
-    fout_.seekp(0,
-                std::ios_base::end);
-    uint32_t file_size = fout_.tellp();
+void WAVWriter::FixHeader() {
+  // get file size
+  m_fout.seekp(0,
+              std::ios_base::end);
+  uint32_t file_size = m_fout.tellp();
 
-    // get RIFF header size position
-    fout_.seekp(sizeof(RIFF),               // RIFF ID size
-                std::ios_base::beg);
-    file_size -= sizeof(ChunkHeader);       // RIFF header
-    fout_.write((const char *)&file_size,
-                sizeof(file_size));
+  // get RIFF header size position
+  m_fout.seekp(sizeof(RIFF), std::ios_base::beg); // RIFF ID size
+  file_size -= sizeof(ChunkHeader);  // RIFF header
+  m_fout.write((const char *)&file_size, sizeof(file_size));
 
-    // get DATA header size position
-    file_size -= sizeof(FormatType)         // Format type size
-                 + sizeof(ChunkHeader)      // FMT chunk header size
-                 + sizeof(FMTChunkData)     // FMT chunk data size
-                 + sizeof(ChunkHeader);     // DATA chunk data size
-    fout_.seekp(sizeof(ChunkHeader)         // RIFF header size
-                + sizeof(FormatType)        // Format type size
-                + sizeof(ChunkHeader)       // FMT header size
-                + sizeof(FMTChunkData)      // FMT data size
-                + sizeof(DATA),             // DATA ID size
-                std::ios_base::beg);
-    fout_.write((char *)&file_size,
-                sizeof(file_size));
+  // get DATA header size position
+  file_size -= sizeof(FormatType)         // Format type size
+               + sizeof(ChunkHeader)      // FMT chunk header size
+               + sizeof(FMTChunkData)     // FMT chunk data size
+               + sizeof(ChunkHeader);     // DATA chunk data size
+  m_fout.seekp(sizeof(ChunkHeader)         // RIFF header size
+                  + sizeof(FormatType)    // Format type size
+                  + sizeof(ChunkHeader)   // FMT header size
+                  + sizeof(FMTChunkData)  // FMT data size
+                  + sizeof(DATA),         // DATA ID size
+              std::ios_base::beg);
+  m_fout.write((char *)&file_size,
+              sizeof(file_size));
 }

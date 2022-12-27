@@ -1,6 +1,7 @@
 #include "reader.hpp"
 
-#include "../io_errors/io_errors.h"
+#include "../errors/io_errors.hpp"
+#include "errors.hpp"
 #include "writer.hpp"
 
 WAVReader::WAVReader(std::string file_path) {
@@ -8,71 +9,79 @@ WAVReader::WAVReader(std::string file_path) {
 }
 
 void WAVReader::Open(std::string file_path) {
-  file_path_ = std::move(file_path);
+  m_file_path = std::move(file_path);
 
   // check file extension
-  if (file_path_.find(".wav") == std::string::npos)
-    throw IncorrectExtension(file_path_);
+  if (m_file_path.find(".wav") == std::string::npos)
+    throw IncorrectExtension(m_file_path);
 
   // file opening
-  fin_.open(file_path_, std::ios_base::binary);
-  if (!fin_.good()) {
-    throw FileNotOpen(file_path_);
+  m_fin.open(m_file_path, std::ios_base::binary);
+  if (!m_fin.good()) {
+    throw FileNotOpen(m_file_path);
   }
 
   ReadHeader();
 }
 
 bool WAVReader::ReadSample(SampleBuffer &sample_buffer) {
-  fin_.read((char *)&sample_buffer[0], sizeof(sample_buffer[0]) * sample_buffer.size());
-  if (fin_.gcount() == 0) {
+  m_fin.read((char *)&sample_buffer[0], sizeof(sample_buffer[0]) * sample_buffer.size());
+  if (m_fin.gcount() == 0) {
     sample_buffer.fill(0);
   }
-  return (bool)fin_.gcount();
+  return (bool)m_fin.gcount();
 }
 
 void WAVReader::SearchChunk(uint32_t chunk_ID) {
   ChunkHeader chunk_header{};
   while (true) {
-    fin_.read((char *)&chunk_header, sizeof(chunk_header));
-    if (!fin_.good()) {
-      throw ChunkNotFound(file_path_, chunk_ID);
+    m_fin.read((char *)&chunk_header, sizeof(chunk_header));
+    if (!m_fin.good()) {
+      throw ChunkNotFound(m_file_path, chunk_ID);
     }
-    if (chunk_header.ID_ == chunk_ID) {
-      break
-    };
-    fin_.seekg(chunk_header.size_, std::fstream::cur);
+    if (chunk_header.m_ID == chunk_ID) {
+      break;
+    }
+    m_fin.seekg(chunk_header.m_size, std::fstream::cur);
   }
 }
 
 void WAVReader::ReadHeader() {
   // check RIFF header
   ChunkHeader RIFF_header{};
-  fin_.read((char *)&RIFF_header, sizeof(RIFF_header));
+  m_fin.read((char *)&RIFF_header, sizeof(RIFF_header));
 
-  if (!fin_.good() || RIFF_header.ID_ != RIFF) {
-    throw IncorrectRIFFHeader(file_path_);
+  if (!m_fin.good() || RIFF_header.m_ID != RIFF) {
+    throw IncorrectRIFFHeader(m_file_path);
   }
 
   // check format type
   FormatType format_type;
-  fin_.read((char *)&format_type, sizeof(format_type));
-  if (!fin_.good() || format_type != WAVE) {
-    throw IncorrectFormatType(file_path_);
+  m_fin.read((char *)&format_type, sizeof(format_type));
+  if (!m_fin.good() || format_type != WAVE) {
+    throw IncorrectFormatType(m_file_path);
   }
 
   // check FMT data
   SearchChunk(FMT_);
   FMTChunkData fmt_chunk_data;
-  fin_.read((char *)&fmt_chunk_data, sizeof(fmt_chunk_data));
-  if (!fin_.good()) {
-    throw IncorrectFormatData(file_path_);
+  m_fin.read((char *)&fmt_chunk_data, sizeof(fmt_chunk_data));
+  if (!m_fin.good()) {
+    throw IncorrectFormatData(m_file_path);
   }
 
-  if (fmt_chunk_data.audio_format_ != AUDIO_FORMAT_PCM) {throw IncorrectAudioFormat(file_path_);}
-  if (fmt_chunk_data.num_channels_ != 1) {throw IncorrectChannelsNumber(file_path_);}
-  if (fmt_chunk_data.bits_per_sample_ != 16) {throw IncorrectSampleBits(file_path_);}
-  if (fmt_chunk_data.sampling_rate_ != SAMPLING_RATE) {throw IncorrectSamplingRate(file_path_);}
+  if (fmt_chunk_data.m_audio_format != AUDIO_FORMAT_PCM) {
+    throw IncorrectAudioFormat(m_file_path);
+  }
+  if (fmt_chunk_data.m_num_channels != 1) {
+    throw IncorrectChannelsNumber(m_file_path);
+  }
+  if (fmt_chunk_data.m_bits_per_sample != 16) {
+    throw IncorrectSampleBits(m_file_path);
+  }
+  if (fmt_chunk_data.m_sampling_rate != SAMPLING_RATE) {
+    throw IncorrectSamplingRate(m_file_path);
+  }
 
   // find DATA data
   SearchChunk(DATA);
