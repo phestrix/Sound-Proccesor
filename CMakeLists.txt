@@ -21,6 +21,7 @@ errors/io_errors.cpp
 convertors/convertor_create.cpp 
 convertors/convertor_errors.cpp 
 convertors/mix.cpp
+convertors/double.cpp 
 convertors/mute.cpp 
 cl/cl_parser.cpp 
 cfg_parser/cfg_parser.cpp 
@@ -38,6 +39,7 @@ convertors/convertor_create.hpp
 convertors/convertor_errors.hpp 
 convertors/convertors_interface.hpp
 convertors/mix.hpp
+convertors/double.hpp
 convertors/mute.hpp 
 cl/cl_parser.hpp 
 cfg_parser/cfg_parser.hpp 
