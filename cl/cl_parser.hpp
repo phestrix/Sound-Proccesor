@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 
-#define CONVERTERS_CONFIG_FILE
+#define CONVERTERS_CONFIG_FILE {}
 
 struct Options{
-  std::string m_ouput_file;
+  std::string m_output_file;
   std::string m_config_file;
   std::vector<std::string> m_input_files;
   Options() = default;
