@@ -6,7 +6,6 @@
 
 /// @brief for case if "#     "
 /// @param str string to check
-/// @return
 static bool IsComment(std::string& str) {
   while (!str.empty() && str[0] == ' ') {
     str.erase(0, 1);
