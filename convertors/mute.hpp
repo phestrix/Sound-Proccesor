@@ -11,9 +11,9 @@ class MuteConverter : public ConverterInterface {
   FileLinks GetFileLinks() override;
 
  private:
-  int start_second_ = 0;
-  int current_second_ = 0;
-  int end_second_ = 0;
+  int m_start_second = 0;
+  int m_current_second = 0;
+  int m_end_second = 0;
 };
 
 #endif

@@ -21,19 +21,19 @@ MixConverter::MixConverter(ConverterParams params) {
   if (!IsNumber(params[1])) {
     throw std::invalid_argument("Incorrect numbers");
   }
-  additional_file_link_ = std::stoi(params[0].substr(1));
-  start_second_ = std::stoi(params[1]);
+  m_additional_file_link = std::stoi(params[0].substr(1));
+  m_start_second = std::stoi(params[1]);
 }
 
 void MixConverter::Process(SampleBuffer& buf, const SampleVector& default_samples) {
-  if (current_second_ >= start_second_) {
+  if (m_current_second >= m_start_second) {
     for (int i = 0; i < buf.size(); ++i) {
-      buf[i] = (buf[i] / 2) + (default_samples[additional_file_link_][i] / 2);
+      buf[i] = (buf[i] / 2) + (default_samples[m_additional_file_link][i] / 2);
     }
-    ++current_second_;
+    ++m_current_second;
   }
 }
 
 FileLinks MixConverter::GetFileLinks() {
-  return {0, additional_file_link_};
+  return {0, m_additional_file_link};
 }

@@ -19,18 +19,17 @@ MuteConverter::MuteConverter(ConverterParams params) {
   if (!IsNumber(params[1]))
     throw std::invalid_argument("Wrong second param");
 
-  start_second_ = std::stoi(params[0]);
-  end_second_ = std::stoi(params[1]);
+  m_start_second = std::stoi(params[0]);
+  m_end_second = std::stoi(params[1]);
 
-  if (start_second_ > end_second_)
+  if (m_start_second > m_end_second)
     throw std::invalid_argument("Incorrect interval");
 }
 
 void MuteConverter::Process(SampleBuffer& buf, const SampleVector& default_samples) {
-  if (current_second_ >= start_second_ &&
-      current_second_ <= end_second_)
+  if (m_current_second >= m_start_second && m_current_second <= m_end_second)
     buf.fill(0);
-  ++current_second_;
+  ++m_current_second;
 }
 
 FileLinks MuteConverter::GetFileLinks() {

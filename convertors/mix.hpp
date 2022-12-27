@@ -3,6 +3,7 @@
 
 #include "convertors_interface.hpp"
 
+/// @brief Converter to mix 2 wav files
 class MixConverter : public ConverterInterface {
  public:
   explicit MixConverter(ConverterParams params);
@@ -11,9 +12,9 @@ class MixConverter : public ConverterInterface {
   FileLinks GetFileLinks() override;
 
  private:
-  int start_second_ = 0;
-  int current_second_ = 0;
-  int additional_file_link_ = 0;
+  int m_start_second = 0;
+  int m_current_second = 0;
+  int m_additional_file_link = 0;
 };
 
 #endif
