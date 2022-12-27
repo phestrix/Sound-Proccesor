@@ -10,10 +10,10 @@ namespace pt = boost::property_tree;
 
 static void PrintConverterDesc() {
   pt::ptree ptree;
-  pt::read_json(CONVERTERS_CONFIG_FILE, ptree);
+  pt::read_json("converters_description.json", ptree);
   std::cout << "Available Converters: " << std::endl;
   for (const auto& converter_info : ptree.get_child("Converters")) {
-    std::cout << " " << std::setw(48) << std::left << converter_info.second.get<std::string>("Command") << converter_info.second.get<std::string>("Description") << std::endl;
+    std::cout << " " << std::setw(40) << std::left << converter_info.second.get<std::string>("Command") << converter_info.second.get<std::string>("Description") << std::endl;
   }
   std::cout << std::endl;
 }

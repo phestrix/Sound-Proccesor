@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#define CONVERTERS_CONFIG_FILE {}
+#define CONVERTERS_CONFIG_FILE "converters_description.json"
 
 struct Options{
   std::string m_output_file;

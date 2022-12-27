@@ -1,6 +1,8 @@
 #include "processor.hpp"
 
-Processor::Processor(std::string config_file, std::string output_file, std::vector<std::string> input_files) : m_config_file(config_file), m_output_file(output_file), m_input_files(input_files) {}
+#include <iostream>
+
+Processor::Processor(std::string config_file, std::string output_file, std::vector<std::string> input_files) : m_config_file(std::move(config_file)), m_output_file(std::move(output_file)), m_input_files(std::move(input_files)) {}
 
 void Processor::Convert() {
   ConfigParser config(m_config_file);
@@ -45,11 +47,14 @@ FileLinks Processor::GetFileLinks(const ConverterVector& pipeline) {
 WAVReaderVector Processor::OpenWAVReaders(const FileLinks& file_links) {
   WAVReaderVector wav_reader_vector(m_input_files.size());
   for (int i : file_links) {
+    
     if (i >= m_input_files.size()) {
-      throw std::invalid_argument("Link doesn't exist");
+      throw std::invalid_argument("Link doesn't exist " + std::to_string(i));
     }
+
     wav_reader_vector[i].Open(m_input_files[i]);
   }
+
   return wav_reader_vector;
 }
 

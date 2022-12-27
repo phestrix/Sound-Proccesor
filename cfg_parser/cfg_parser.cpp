@@ -46,6 +46,6 @@ ConverterCommand ConfigParser::GetConverterComand() {
   while (ssin >> buf) {
     cvt_cmd.push_back(buf);
   }
-
+  
   return cvt_cmd;
 }

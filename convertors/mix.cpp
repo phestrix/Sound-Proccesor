@@ -1,6 +1,7 @@
 #include "mix.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
 
 static bool IsNumber(const std::string& str) {
@@ -30,8 +31,8 @@ void MixConverter::Process(SampleBuffer& buf, const SampleVector& default_sample
     for (int i = 0; i < buf.size(); ++i) {
       buf[i] = (buf[i] / 2) + (default_samples[m_additional_file_link][i] / 2);
     }
-    ++m_current_second;
   }
+  ++m_current_second;
 }
 
 FileLinks MixConverter::GetFileLinks() {
